@@ -107,6 +107,7 @@ starlette==1.2.1
 systemd-python==235
 tenacity==9.1.4
 tiktoken==0.13.0
+tinydb==4.8.2
 tqdm==4.67.3
 typing-inspection==0.4.2
 typing_extensions==4.15.0
