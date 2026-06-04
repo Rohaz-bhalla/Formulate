@@ -13,7 +13,16 @@ def generate_site_node(state: AgentState):
     llm = ChatOpenAI(model="openai/gpt-oss-120b:free", temperature=0.7)
     structured_llm = llm.with_structured_output(WebsiteSchema)
 
-    prompt = f"Create a website for {state['request'].brand_name}. Category: {state['request'].category}."
+    prompt = f"""
+    You are an expert website builder. Generate a website landing page based on:
+    Brand: {state['request'].brand_name}
+    Category: {state['request'].category}
+    Tone: {state['request'].tone}
+    Products: {state['request'].products}
+    
+    You must strictly follow the schema provided. Do not include conversational filler like 
+    'I'm sorry' or 'Here is your site'. Return ONLY the structured data.
+    """
     if state.get("feedback"):
         prompt += f" Refine based on feedback: {state['feedback']}"
     
