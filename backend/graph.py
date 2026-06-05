@@ -1,4 +1,4 @@
-from typing import Annotated, Optional, TypedDict
+from typing import Optional, TypedDict
 from langgraph.graph import StateGraph, END
 from langchain_openai import ChatOpenAI
 from schemas import WebsiteSchema, BrandRequest
@@ -14,37 +14,32 @@ def generate_site_node(state: AgentState):
     structured_llm = llm.with_structured_output(WebsiteSchema)
 
     prompt = f"""
-    You are an expert website builder. Generate a website landing page based on:
-    Brand: {state['request'].brand_name}
-    Category: {state['request'].category}
-    Tone: {state['request'].tone}
-    Products: {state['request'].products}
-    
-    You must strictly follow the schema provided. Do not include conversational filler like 
-    'I'm sorry' or 'Here is your site'. Return ONLY the structured data.
+    You are an expert frontend developer and web designer. 
+    Your task is to write a single, complete, beautiful, and fully-responsive 'index.html' landing page file.
+
+    Brand Profile:
+    - Name: {state['request'].brand_name}
+    - Category: {state['request'].category}
+    - Aesthetic / Tone: {state['request'].tone}
+    - Products/Services: {state['request'].products}
+
+    Requirements:
+    1. Output a complete HTML document starting with <!DOCTYPE html>.
+    2. Include the Tailwind CSS Play CDN script tag in the <head> for styling: <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    3. Ensure the design matches the requested tone (e.g., sleek/dark for modern tech, warm/pastel for bakery).
+    4. Include interactive elements with vanilla Javascript inside <script> tags if necessary (like custom interactions or mobile navbar toggles).
+    5. The output must fit perfectly into the `compiled_html` property of the schema. Do not escape formatting or wrap it in conversational text.
     """
+    
     if state.get("feedback"):
-        prompt += f" Refine based on feedback: {state['feedback']}"
+        prompt += f"\n\nCRITICAL MODIFICATION REQUEST: The user wants edits based on this feedback: {state['feedback']}. Revise the HTML code accordingly."
     
     response = structured_llm.invoke(prompt)
     return {"generated_config": response, "retry_count": state["retry_count"] + 1}
 
-def should_continue(state: AgentState):
-    if state["retry_count"] >= 2:
-        return END
-    return "generator"
-
 workflow = StateGraph(AgentState)
 workflow.add_node("generator", generate_site_node)
 workflow.set_entry_point("generator")
-
-workflow.add_conditional_edges(
-    "generator", 
-    should_continue,
-    {
-        "generator": "generator",
-        "__end__": END
-    }
-)
+workflow.add_edge("generator", END)
 
 app_graph = workflow.compile()

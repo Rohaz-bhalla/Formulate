@@ -1,39 +1,48 @@
-import React from 'react';
+"use client";
+
+import React from "react";
 
 interface SiteData {
-  hero_title: string;
-  hero_subtitle: string;
-  about_text: string;
-  products: string[];
-  color_palette: string;
+  compiled_html?: string;
 }
 
-export default function SitePreview({ data }: { data: SiteData }) {
+interface SitePreviewProps {
+  data: SiteData | null;
+}
+
+export default function SitePreview({ data }: SitePreviewProps) {
+  if (!data || !data.compiled_html) {
+    return (
+      <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50 text-gray-500 rounded-lg p-12 min-h-[400px]">
+        <p className="text-center font-medium text-lg">
+          Fill out the form above to generate your website preview.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full bg-white text-gray-900 font-sans">
-        
-      <section className="py-20 px-6 text-center bg-gray-50">
-        <h1 className="text-5xl font-extrabold mb-4">{data.hero_title}</h1>
-        <p className="text-xl text-gray-600">{data.hero_subtitle}</p>
-      </section>
-
-      <section className="py-16 px-6 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-6">About Us</h2>
-        <p className="text-lg leading-relaxed">{data.about_text}</p>
-      </section>
-
-      <section className="py-16 px-6 bg-gray-900 text-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8">Our Products</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {data.products.map((product, idx) => (
-              <div key={idx} className="p-6 border border-gray-700 rounded-lg">
-                {product}
-              </div>
-            ))}
-          </div>
+    <div className="w-full flex flex-col bg-white rounded-lg overflow-hidden border border-gray-200 shadow-xl min-h-[600px]">
+      
+      <div className="bg-gray-100 border-b border-gray-200 px-4 py-3 flex items-center gap-2 select-none">
+        <div className="flex gap-1.5">
+          <span className="w-3 h-3 bg-red-400 rounded-full inline-block"></span>
+          <span className="w-3 h-3 bg-yellow-400 rounded-full inline-block"></span>
+          <span className="w-3 h-3 bg-green-400 rounded-full inline-block"></span>
         </div>
-      </section>
+        <div className="bg-white text-gray-400 text-xs py-1 px-4 rounded-md ml-4 w-full max-w-md truncate border border-gray-200 shadow-sm font-mono">
+          index.html (Live Preview)
+        </div>
+      </div>
+
+      <div className="w-full flex-1 min-h-[550px] relative bg-white">
+        <iframe
+          title="Generated Website Preview"
+          srcDoc={data.compiled_html}
+          className="w-full h-full absolute inset-0 border-none"
+          sandbox="allow-scripts"
+        />
+      </div>
     </div>
   );
 }
