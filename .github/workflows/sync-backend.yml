@@ -1,0 +1,40 @@
+name: Deploy Backend to Hugging Face
+
+on:
+  # 1. Triggers AUTOMATICALLY when you push code to the main branch
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**' # Only runs if you actually changed python files!
+  
+  # 2. Allows you to run it MANUALLY by clicking a button in GitHub
+  workflow_dispatch: 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push Backend Folder to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # Setup git robot
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions Sync"
+          
+          # Download the current live Hugging Face space
+          git clone https://user:$HF_TOKEN@huggingface.co/spaces/RohazBhalla/Formulate-api hf_space
+          
+          # Copy everything from your GitHub 'backend' folder into the Hugging Face space
+          cp -r backend/* hf_space/
+          
+          # Push the updated files back to Hugging Face
+          cd hf_space
+          git add .
+          git commit -m "Auto-sync backend from GitHub" || echo "No changes to commit"
+          git push https://user:$HF_TOKEN@huggingface.co/spaces/RohazBhalla/Formulate-api main
