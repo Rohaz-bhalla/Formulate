@@ -17,3 +17,17 @@ const response = await fetch('http://127.0.0.1:8000/generate-site', {
   const data = await response.json();
   return NextResponse.json(data);
 }
+
+export async function GET() {
+  const response = await fetch('http://127.0.0.1:8000/explore-sites', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    return NextResponse.json({ error: 'Failed to fetch gallery' }, { status: response.status });
+  }
+
+  const data = await response.json();
+  return NextResponse.json(data);
+}
