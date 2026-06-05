@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
-  const [darkMode, setDarkMode] = useState(false);
   const [formData, setFormData] = useState({
     brand_name: "", 
     category: "", 
@@ -24,14 +23,6 @@ export default function Home() {
   const [feedback, setFeedback] = useState("");
   const [result, setResult] = useState<{ compiled_html?: string } | null>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +84,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
       
       {/* Extracted Modular Navbar Component Integration */}
-      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Navbar />
 
       <main className="max-w-7xl mx-auto p-6 flex flex-col lg:flex-row gap-8">
         
