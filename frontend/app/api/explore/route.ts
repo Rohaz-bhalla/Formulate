@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
+const baseUrl = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+
 export async function GET() {
   try {
-    const response = await fetch('http://127.0.0.1:8000/explore-sites', {
+    const response = await fetch(`${baseUrl}/explore-sites`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store'
