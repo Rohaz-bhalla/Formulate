@@ -1,9 +1,16 @@
 "use client";
 
-import { useState } from 'react';
-import SitePreview from '@/components/SitePreview';
+import { useState, useEffect } from "react";
+import { Sparkles, RefreshCw } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import SitePreview from "@/components/SitePreview";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
+  const [darkMode, setDarkMode] = useState(false);
   const [formData, setFormData] = useState({
     brand_name: "", 
     category: "", 
@@ -18,29 +25,32 @@ export default function Home() {
   const [result, setResult] = useState<{ compiled_html?: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Handles initial form generation
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await fetch('/api', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          feedback: ""
-        }),
+      const res = await fetch("/api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, feedback: "" }),
       });
 
       if (res.status === 403) {
-        alert("Max retries reached! Please contact support.");
+        alert("Max retries reached!");
         setLoading(false);
         return;
       }
 
       if (!res.ok) throw new Error("Generation failed");
-
       const data = await res.json();
       setResult(data);
     } catch (err) {
@@ -56,149 +66,161 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          feedback: feedback
-        }),
+      const res = await fetch("/api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, feedback: feedback }),
       });
 
       if (res.status === 403) {
-        alert("Max refinement retries reached!");
+        alert("Max refinement limits reached!");
         setLoading(false);
         return;
       }
 
       if (!res.ok) throw new Error("Refinement failed");
-
       const data = await res.json();
       setResult(data);
       setFeedback("");
     } catch (err) {
-      alert("Failed to refine design. Please check backend connection.");
+      alert("Failed to inject structural context modifications.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="max-w-7xl mx-auto p-6 min-h-screen flex flex-col lg:flex-row gap-8">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
       
-      <div className="w-full lg:w-1/3 space-y-6">
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <h1 className="text-xl font-bold text-gray-900 mb-4">Formulate Builder</h1>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Brand Name</label>
-              <input
-                required
-                placeholder="e.g. Acme Tech"
-                className="border border-gray-300 p-2.5 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.brand_name}
-                onChange={(e) => setFormData({ ...formData, brand_name: e.target.value })}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Category</label>
-              <input
-                required
-                placeholder="e.g. AI Consulting Services"
-                className="border border-gray-300 p-2.5 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              />
-            </div>
+      {/* Extracted Modular Navbar Component Integration */}
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Aesthetic Tone</label>
-              <input
-                required
-                placeholder="e.g. Minimalist Dark Corporate"
-                className="border border-gray-300 p-2.5 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.tone}
-                onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
-              />
-            </div>
+      <main className="max-w-7xl mx-auto p-6 flex flex-col lg:flex-row gap-8">
+        
+        <div className="w-full lg:w-1/3 space-y-6">
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-md font-bold">Configuration Model</CardTitle>
+              <CardDescription>Define specifications for layout generation models.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Brand Name</label>
+                  <Input
+                    required
+                    placeholder="e.g. Acme Studio"
+                    value={formData.brand_name}
+                    onChange={(e) => setFormData({ ...formData, brand_name: e.target.value })}
+                  />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Category</label>
+                  <Input
+                    required
+                    placeholder="e.g. Premium Tech Agency"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  />
+                </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Brief Introduction</label>
-              <textarea
-                required
-                rows={3}
-                placeholder="Summarize the core value proposition..."
-                className="border border-gray-300 p-2.5 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                value={formData.intro}
-                onChange={(e) => setFormData({ ...formData, intro: e.target.value })}
-              />
-            </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Theme Aesthetic</label>
+                  <Input
+                    required
+                    placeholder="e.g. Minimalist Dark Corporate"
+                    value={formData.tone}
+                    onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
+                  />
+                </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Key Offerings / Products</label>
-              <input
-                required
-                placeholder="e.g. Cloud Scaling, Model Fine-Tuning"
-                className="border border-gray-300 p-2.5 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.products}
-                onChange={(e) => setFormData({ ...formData, products: e.target.value })}
-              />
-            </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Intro Bio Summary</label>
+                  <Textarea
+                    required
+                    rows={3}
+                    placeholder="Summarize core brand values..."
+                    className="resize-none"
+                    value={formData.intro}
+                    onChange={(e) => setFormData({ ...formData, intro: e.target.value })}
+                  />
+                </div>
 
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2.5 px-4 rounded-md w-full text-sm transition-colors shadow-sm"
-            >
-              {loading && !result ? "Generating Site..." : "Generate Website Blueprint"}
-            </button>
-          </form>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Offerings & Services</label>
+                  <Input
+                    required
+                    placeholder="e.g. Cloud Scaling, Core Frontend Engines"
+                    value={formData.products}
+                    onChange={(e) => setFormData({ ...formData, products: e.target.value })}
+                  />
+                </div>
+
+                <Button type="submit" disabled={loading} className="w-full mt-2 gap-2">
+                  {loading && !result ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  {loading && !result ? "Compiling Framework..." : "Build Layout Framework"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {result && (
+            <Card className="shadow-sm border-indigo-500/20 dark:border-indigo-400/10 bg-indigo-50/10 dark:bg-indigo-950/5">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-bold">Iterative Adjustments</CardTitle>
+                <CardDescription>Type specific design requests to override layouts.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleRefineSubmit} className="space-y-2">
+                  <Textarea
+                    rows={2}
+                    placeholder="e.g. Turn hero sections dark navy and center text details..."
+                    className="text-xs bg-background resize-none"
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                  />
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    disabled={loading || !feedback.trim()}
+                    className="w-full text-xs h-9 gap-1.5"
+                  >
+                    {loading ? (
+                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    {loading ? "Revising Code Elements..." : "Inject Structural Modification"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        {result && (
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3">
-            <h2 className="text-sm font-bold text-gray-900">Iterative Adjustments</h2>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              Not exactly what you envisioned? Type specific requests below to recalculate styling patterns or structure updates.
-            </p>
-            <form onSubmit={handleRefineSubmit} className="space-y-2">
-              <textarea
-                rows={2}
-                placeholder="e.g. Change hero background color to warm orange..."
-                className="border border-gray-300 p-2 rounded-md w-full text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-              />
-              <button
-                type="submit"
-                disabled={loading || !feedback.trim()}
-                className="bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 text-white font-medium py-1.5 px-3 rounded-md w-full text-xs transition-colors"
-              >
-                {loading ? "Re-working layout structures..." : "Apply Modification"}
-              </button>
-            </form>
-          </div>
-        )}
-      </div>
+        <div className="flex-1 min-h-[600px] flex flex-col">
+          {loading && (
+            <div className="flex-1 flex flex-col items-center justify-center border border-dashed rounded-xl p-8 bg-muted/10">
+              <RefreshCw className="h-8 w-8 animate-spin text-blue-600 mb-4 stroke-1" />
+              <p className="text-sm text-muted-foreground font-medium animate-pulse">
+                Assembling responsive source code parameters...
+              </p>
+            </div>
+          )}
 
-      <div className="flex-1 min-h-[600px] flex flex-col">
-        {loading && (
-          <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
-            <p className="text-sm text-gray-500 font-medium animate-pulse">
-              Compiling Tailwind components & layouts...
-            </p>
-          </div>
-        )}
+          {!loading && (
+            <div className="flex-1 flex flex-col">
+              <SitePreview data={result} />
+            </div>
+          )}
+        </div>
 
-        {!loading && (
-          <div className="flex-1 flex flex-col">
-            <SitePreview data={result} />
-          </div>
-        )}
-      </div>
-
-    </main>
+      </main>
+    </div>
   );
 }
