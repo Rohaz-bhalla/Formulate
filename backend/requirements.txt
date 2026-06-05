@@ -8,7 +8,7 @@ certifi==2026.1.4
 cffi==2.0.0
 charset-normalizer==3.4.4
 click==8.3.3
-cockpit @ file:///builddir/build/BUILD/cockpit-362-build/cockpit-362/tmp/wheel/cockpit-362-py3-none-any.whl#sha256=a58100d7b054f1045e44ec3dd522c668a810e37d4f519988ec469b87a17d1e7c
+
 crypt_r==3.13.1
 cryptography==48.0.0
 cupshelpers==1.0
@@ -71,7 +71,7 @@ pydantic_core==2.46.4
 pyenchant==3.3.0
 PyGObject==3.56.3
 pyinotify==0.9.6
-pykickstart @ file:///builddir/build/BUILD/pykickstart-3.69-build/pykickstart-3.69
+
 pyOpenSSL==26.1.0
 pyparted==3.13.0
 PyQt6==6.11.0
@@ -94,8 +94,7 @@ requests-file==3.0.0
 requests-ftp==0.3.1
 requests-toolbelt==1.0.0
 rpm==6.0.1
-selinux @ file:///builddir/build/BUILD/libselinux-3.10-build/libselinux-3.10/src
-sepolicy @ file:///builddir/build/BUILD/policycoreutils-3.10-build/selinux-3.10/python/sepolicy
+
 setools==4.6.0
 setuptools==80.10.2
 simpleline==1.9.0
